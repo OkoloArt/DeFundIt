@@ -1,57 +1,106 @@
 import { Contract } from '@algorandfoundation/tealscript';
 
 export class DeFundIt extends Contract {
+  minimumFunding = GlobalStateKey<uint64>();
+
+  fundingTarget = GlobalStateKey<uint64>();
+
+  beneficiaryAddress = GlobalStateKey<Address>();
+
+  funds = GlobalStateKey<uint64>();
+
   /**
-   * Calculates the sum of two numbers
+   * Initializes the DeFundIt application with the provided beneficiary address.
    *
-   * @param a
-   * @param b
-   * @returns The sum of a and b
+   * @param addr - The Algorand address of the beneficiary.
+   *
+   * @remarks
+   * This function sets the minimum funding amount to 1 Algo, the funding target to 10,000,000 Algo,
+   * and initializes the funds to 0 Algo. The beneficiary address is set to the provided address.
+   *
+   * @returns {void}
    */
-  private getSum(a: uint64, b: uint64): uint64 {
-    return a + b;
+  createApplication(addr: Address): void {
+    this.minimumFunding.value = 1;
+    this.fundingTarget.value = 10000000;
+    this.beneficiaryAddress.value = addr;
+    this.funds.value = 0;
   }
 
   /**
-   * Calculates the difference between two numbers
+   * Processes a payment transaction and updates the funds in the DeFundIt application.
    *
-   * @param a
-   * @param b
-   * @returns The difference between a and b.
+   * @param senderTxn - The payment transaction to be processed.
+   *
+   * @remarks
+   * This function verifies the payment transaction, checks if the amount is greater than or equal to the minimum funding amount,
+   * and ensures that the total funds after the transaction do not exceed the funding target.
+   * If the conditions are met, the function updates the funds in the application.
+   *
+   * @returns {void}
    */
-  private getDifference(a: uint64, b: uint64): uint64 {
-    return a >= b ? a - b : b - a;
+  sendFunding(senderTxn: PayTxn): void {
+    assert(senderTxn.amount >= this.minimumFunding.value, 'quantity must be >= this.minimumFunding.value');
+    assert(this.funds.value + senderTxn.amount <= this.fundingTarget.value, 'funding target must be higher than funds');
+
+    verifyPayTxn(senderTxn, {
+      sender: this.txn.sender,
+      receiver: this.app.address,
+    });
+
+    this.funds.value += senderTxn.amount;
   }
 
   /**
-   * A method that takes two numbers and does either addition or subtraction
+   * Transfers the funds to the beneficiary address if the total funds match the funding target.
    *
-   * @param a The first uint64
-   * @param b The second uint64
-   * @param operation The operation to perform. Can be either 'sum' or 'difference'
+   * @remarks
+   * This function verifies if the total funds in the DeFundIt application match the funding target.
+   * If the condition is met, it sends a payment transaction to the beneficiary address with the
+   * current funds amount and a note indicating the transfer.
    *
-   * @returns The result of the operation
+   * @throws Throws an assertion error if the total funds do not match the funding target.
+   *
+   * @returns {void}
    */
-  doMath(a: uint64, b: uint64, operation: string): uint64 {
-    let result: uint64;
+  SendFundToBeneficiary(): void {
+    assert(this.funds.value === this.fundingTarget.value, 'Funds must be equal to the funding target');
 
-    if (operation === 'sum') {
-      result = this.getSum(a, b);
-    } else if (operation === 'difference') {
-      result = this.getDifference(a, b);
-    } else throw Error('Invalid operation');
-
-    return result;
+    sendPayment({
+      receiver: this.beneficiaryAddress.value,
+      amount: this.funds.value,
+      note: 'DeFundIt funds sent',
+      sender: this.app.address,
+    });
   }
 
   /**
-   * A demonstration method used in the AlgoKit fullstack template.
-   * Greets the user by name.
+   * Retrieves the beneficiary address associated with the DeFundIt application.
    *
-   * @param name The name of the user to greet.
-   * @returns A greeting message to the user.
+   * @returns {Address} - The Algorand address of the beneficiary.
+   *
+   * @remarks
+   * This function returns the beneficiary address that was set during the application initialization.
+   * The beneficiary address is used to receive funds once the total funds match the funding target.
    */
-  hello(name: string): string {
-    return 'Hello, ' + name;
+  getBeneficiaryAddress(): Address {
+    return this.beneficiaryAddress.value;
+  }
+
+  /**
+   * Deletes the DeFundIt application from the Algorand blockchain.
+   *
+   * @remarks
+   * This function is intended to be called when the DeFundIt application is no longer needed.
+   * It verifies that the sender of the transaction is the creator of the application and then
+   * deletes the application from the Algorand blockchain.
+   *
+   * @throws Throws an assertion error if the sender of the transaction is not the creator of the application.
+   *
+   * @returns {void}
+   */
+  deleteApplication(): void {
+    assert(this.app.creator === this.txn.sender, 'sender must be the creator of the application');
+    // Implementation of deleteApplication function
   }
 }

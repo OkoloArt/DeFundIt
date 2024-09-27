@@ -1,0 +1,63 @@
+{
+  "name": "DeFundIt",
+  "desc": "",
+  "methods": [
+    {
+      "name": "createApplication",
+      "desc": "Initializes the DeFundIt application with the provided beneficiary address.",
+      "args": [
+        {
+          "name": "addr",
+          "type": "address",
+          "desc": "The Algorand address of the beneficiary."
+        }
+      ],
+      "returns": {
+        "type": "void",
+        "desc": "void"
+      }
+    },
+    {
+      "name": "sendFunding",
+      "desc": "Processes a payment transaction and updates the funds in the DeFundIt application.",
+      "args": [
+        {
+          "name": "senderTxn",
+          "type": "pay",
+          "desc": "The payment transaction to be processed."
+        }
+      ],
+      "returns": {
+        "type": "void",
+        "desc": "void"
+      }
+    },
+    {
+      "name": "SendFundToBeneficiary",
+      "desc": "Transfers the funds to the beneficiary address if the total funds match the funding target.",
+      "args": [],
+      "returns": {
+        "type": "void",
+        "desc": "void"
+      }
+    },
+    {
+      "name": "getBeneficiaryAddress",
+      "desc": "Retrieves the beneficiary address associated with the DeFundIt application.",
+      "args": [],
+      "returns": {
+        "type": "address",
+        "desc": "Address - The Algorand address of the beneficiary."
+      }
+    },
+    {
+      "name": "deleteApplication",
+      "desc": "Deletes the DeFundIt application from the Algorand blockchain.",
+      "args": [],
+      "returns": {
+        "type": "void",
+        "desc": "void"
+      }
+    }
+  ]
+}
