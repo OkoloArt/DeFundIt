@@ -23,7 +23,7 @@ DeFundIt is a smart contract built on the Algorand blockchain using TEALScript. 
 
 ## Functions
 
-### 1. `createApplication(addr: Address)`
+### 1. `createApplication(addr: Address, fundingTarget: uint64)`
 
 Initializes the DeFundIt contract with the following parameters:
 
