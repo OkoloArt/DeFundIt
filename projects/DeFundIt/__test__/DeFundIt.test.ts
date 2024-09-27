@@ -150,8 +150,9 @@ describe('DeFundIt', () => {
     expect(fundValue).toBe(10000000n);
   });
 
-  // Check and Senf the funds to the beneficiary account if funding target is met
-  test('checkAndSendFunds', async () => {
+  // Check and Send the funds to the beneficiary account if funding target is met
+  // Clear the state of the smart contract
+  test('SendFundsAndDelete', async () => {
     const { appAddress } = await appClient.appClient.getAppReference();
 
     const result = await appClient.sendFundToBeneficiary(
@@ -166,12 +167,9 @@ describe('DeFundIt', () => {
 
     const { amount: finalAmount } = await algorand.account.getInformation(appAddress);
     console.log(`finalAmount: ${finalAmount}`);
-  });
 
-  // Clear the state of the smart contract
-  test('deleteApplication', async () => {
-    const result = await appClient.delete.deleteApplication({});
+    const deleteResult = await appClient.delete.deleteApplication({});
 
-    expect(result.confirmation).toBeDefined();
+    expect(deleteResult.confirmation).toBeDefined();
   });
 });
