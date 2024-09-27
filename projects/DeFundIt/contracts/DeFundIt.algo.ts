@@ -20,9 +20,9 @@ export class DeFundIt extends Contract {
    *
    * @returns {void}
    */
-  createApplication(addr: Address): void {
+  createApplication(addr: Address, fundingTarget: uint64): void {
     this.minimumFunding.value = 1;
-    this.fundingTarget.value = 10000000;
+    this.fundingTarget.value = fundingTarget;
     this.beneficiaryAddress.value = addr;
     this.funds.value = 0;
   }

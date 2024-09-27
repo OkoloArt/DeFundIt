@@ -22,8 +22,12 @@ switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEM
 	// The requested action is not implemented in this contract. Are you using the correct OnComplete? Did you set your app ID?
 	err
 
-// createApplication(address)void
+// createApplication(address,uint64)void
 *abi_route_createApplication:
+	// fundingTarget: uint64
+	txna ApplicationArgs 2
+	btoi
+
 	// addr: address
 	txna ApplicationArgs 1
 	dup
@@ -31,15 +35,15 @@ switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEM
 	int 32
 	==
 
-	// argument 0 (addr) for createApplication must be a address
+	// argument 1 (addr) for createApplication must be a address
 	assert
 
-	// execute createApplication(address)void
+	// execute createApplication(address,uint64)void
 	callsub createApplication
 	int 1
 	return
 
-// createApplication(addr: Address): void
+// createApplication(addr: Address, fundingTarget: uint64): void
 //
 // Initializes the DeFundIt application with the provided beneficiary address.
 //
@@ -51,7 +55,7 @@ switch *call_NoOp *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEMENTED *NOT_IMPLEM
 //
 // @returns {void}
 createApplication:
-	proto 1 0
+	proto 2 0
 
 	// contracts/DeFundIt.algo.ts:24
 	// this.minimumFunding.value = 1
@@ -60,9 +64,9 @@ createApplication:
 	app_global_put
 
 	// contracts/DeFundIt.algo.ts:25
-	// this.fundingTarget.value = 10000000
+	// this.fundingTarget.value = fundingTarget
 	byte 0x66756e64696e67546172676574 // "fundingTarget"
-	int 10000000
+	frame_dig -2 // fundingTarget: uint64
 	app_global_put
 
 	// contracts/DeFundIt.algo.ts:26
@@ -311,7 +315,7 @@ deleteApplication:
 	retsub
 
 *create_NoOp:
-	method "createApplication(address)void"
+	method "createApplication(address,uint64)void"
 	txna ApplicationArgs 0
 	match *abi_route_createApplication
 

@@ -13,6 +13,7 @@ let appClient: DeFundItClient;
 let beneficiaryAddress: string;
 let secondSender: algosdk.Account;
 let algorand: algokit.AlgorandClient;
+let fundingTarget: number;
 
 describe('DeFundIt', () => {
   beforeEach(fixture.beforeEach);
@@ -44,9 +45,10 @@ describe('DeFundIt', () => {
     );
 
     beneficiaryAddress = creator.addr;
+    fundingTarget = 10000000;
 
     // Create the DeFundIt application with the beneficiary address
-    await appClient.create.createApplication({ addr: beneficiaryAddress });
+    await appClient.create.createApplication({ addr: beneficiaryAddress, fundingTarget });
   });
 
   // Deposit funds into the smart contract
